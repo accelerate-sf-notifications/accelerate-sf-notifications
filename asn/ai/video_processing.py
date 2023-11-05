@@ -34,13 +34,13 @@ from concurrent.futures import ThreadPoolExecutor
 
 import ffmpeg
 
-file_path = "/Users/ouyangzhihao/Desktop/sf_hackathon/accelerate-sf-notifications/data/video1/chapter.json"
+file_path = "../chaonan99/data/response.json"
 with open(file_path, 'r') as json_file:
     data = json.load(json_file)
 chapter_json = data
 
 
-working_dir = '/Users/ouyangzhihao/Desktop/sf_hackathon/accelerate-sf-notifications/data/video1/short_videos'
+working_dir = '../chaonan99/data/'
 
 
 # Your chapter JSON and working_dir would be defined here as before
@@ -81,7 +81,8 @@ def gen_video_segments(input_video_path: str) -> list:
 
 # Example usage
 # input_video = '/Users/ouyangzhihao/Desktop/Screen Recording 2023-02-28 at 11.00.34.mov'
-input_video = '/Users/ouyangzhihao/Downloads/San Francisco Board Meeting.mp4'
+input_video = '../chaonan99/data/sanfrancisco_bos_oct31_1.mp4'
+
 generated_segments = gen_video_segments(input_video)
 
 # Optionally print the paths of the generated segments

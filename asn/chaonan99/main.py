@@ -1,3 +1,4 @@
+import os
 import json
 from time import time
 
@@ -16,7 +17,9 @@ tw_client = Client(account_sid, auth_token)
 mas_client = Mastodon(access_token=vars["mastodon"]["access_token"], api_base_url="https://mastodon.social")
 
 info = json.load(open("asn/chaonan99/data/response.json"))
+# video_path = "sanfrancisco_bos_oct31_1.mp4"
 video_path = "asn/chaonan99/data/sanfrancisco_bos_oct31_1.mp4"
+video_path_template = "asn/chaonan99/data/chapter_{number}.mp4"
 
 # if st.checkbox('Show content'):
 #     st.markdown('<span style="color:red">This is some content.</span>', unsafe_allow_html=True)
@@ -35,6 +38,8 @@ def initialize():
     st.session_state['prev_time'] = -1
     st.session_state['current_section'] = 0
     st.session_state['messages'] = []
+    st.session_state['video_path'] = ''
+    st.session_state['phone_number'] = ''
 
 
 def page_1():
@@ -42,6 +47,10 @@ def page_1():
     tags = info["hashtags"]
     for tag in tags:
         st.session_state.concerned_tags[tag] = st.checkbox(tag, value=True)
+    
+    phone_number = st.text_input("Your phone number")
+    if phone_number:
+        st.session_state['phone_number'] = phone_number
 
     if st.button("Subscribe"):
         st.session_state.stage = 2
@@ -79,10 +88,14 @@ def page_2():
     # Display video transcript in the left column
     # col1.header("Happening now")
     col1.subheader(c['chapter_title'])
-    col2.video(video_path, start_time=c['start'])
+    curr_video_path = video_path_template.format(number=c['chapter_number'])
+    if not os.path.exists(curr_video_path):
+        os.symlink(video_path, curr_video_path)
+        # col2.video(curr_video_path)
+    col2.video(video_path, start_time=c["start"])
 
     # col1.header("Summary")
-    col1.caption(c["chapter_summary"])
+    col1.write(c["chapter_summary"])
     tags_current_chapter = np.random.choice(tags, 3, replace=False)
     # Display video in the right column
     # col2.header("Video")
@@ -103,16 +116,20 @@ def page_2():
     if len(set(tags_current_chapter) & set(interested_tags)) == 0:
         st.subheader("No interested topic.")
     else:
-        ## TODO: oyzh: actually send notification
-        background_info = "Monthly gathering for Peninsula for Everyone. Meet and organize with neighbors who are working to build a more inclusive and sustainable region."
-        post = generate_twitter_post(background_info)
-        message = tw_client.messages.create(
-            from_=vars["twilio"]["message_from"],
-            body=post,
-            to=vars["twilio"]["message_to"]
-        )
-        # mas_client
-        st.subheader(f"Notification sent. {message.sid}, {post}")
+        with st.spinner(text="In progress..."):
+            ## TODO: oyzh: actually send notification
+            background_info = c["chapter_summary"]
+            post = generate_twitter_post(background_info)
+            if len(st.session_state.phone_number) == 10:
+                pn = f'+1{st.session_state.phone_number}'
+                message = tw_client.messages.create(
+                    from_=vars["twilio"]["message_from"],
+                    body=post,
+                    to=pn,
+                )
+            st.subheader(f"Notification sent.")
+            # st.subheader(message.sid)
+            st.write(post)
 
     # if st.button("Hearing finished"):
     #     st.session_state.stage = 3
