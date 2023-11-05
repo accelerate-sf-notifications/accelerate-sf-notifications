@@ -132,7 +132,7 @@ def page_2():
 
 
 def page_3():
-    st.write("Show some summarization video")
+    st.subheader("Watch the video recoding and ask your questions")
     ## TODO: chaonan99
     ## put a short video
     ## implement search
