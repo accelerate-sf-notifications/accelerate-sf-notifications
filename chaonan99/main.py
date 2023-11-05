@@ -3,7 +3,6 @@ from time import time
 
 import numpy as np
 import streamlit as st
-from my_component import my_component
 
 
 info = json.load(open("data/response.json"))
@@ -24,6 +23,7 @@ def initialize():
     tags = info["hashtags"]
     st.session_state['concerned_tags'] = {t: False for t in tags}
     st.session_state['prev_time'] = -1
+    st.session_state['current_section'] = 0
 
 
 def page_1():
@@ -47,14 +47,19 @@ def page_2():
     # r1c1, r1c2 = st.columns(2)
     st.header(f"Live: {info['title']}")
     col1, col2 = st.columns(2)
+    # current_time = int((time() - st.session_state.page_2_start_time) / 10)
+    # print(current_time)
     # current_time = video_comp()
-    current_time = 300
     # current_time = r1c1.number_input("Mock livestreaming time", min_value=1, max_value=600)
-    print(current_time)
     # from IPython import embed; embed(using=False); os._exit(0)
-    for c in chapters:
-        if c["start"] <= current_time and c["end"] > current_time:
-            break
+    if st.session_state.current_section < len(chapters):
+        c = chapters[st.session_state.current_section]
+    else:
+        st.session_state.stage = 3
+        st.experimental_rerun()
+    # for c in chapters:
+    #     if c["start"] <= current_time and c["end"] > current_time:
+    #         break
 
     ## All tags
     tags = info["hashtags"]
@@ -63,6 +68,7 @@ def page_2():
     # Display video transcript in the left column
     # col1.header("Happening now")
     col1.subheader(c['chapter_title'])
+    col2.video(video_path, start_time=c['start'])
 
     # col1.header("Summary")
     col1.caption(c["chapter_summary"])
@@ -75,9 +81,6 @@ def page_2():
     # else:
     # if r1c2.button("Set livestreming time"):
     #     col2.video(video_path, start_time=current_time)
-    with col2:
-        current_time = my_component(h=300)
-    # col2.video(video_path, start_time=300)
 
     st.subheader("Hashtags")
     for tag in tags_current_chapter:
@@ -90,14 +93,22 @@ def page_2():
         st.subheader("No interested topic.")
     else:
         st.subheader("Have interested tags. Sending notification.")
+        ## TODO: actually send notification
 
-    if st.button("Hearing finished"):
-        st.session_state.stage = 3
-        st.experimental_rerun()
+    # if st.button("Hearing finished"):
+    #     st.session_state.stage = 3
+    if st.button("next section"):
+        print(c['start'])
+        st.session_state.current_section += 1
+        # st.experimental_rerun()
 
 
 def page_3():
     st.write("Show some summarization video")
+    ## TODO: oyzh
+    ## put a short video
+    ## implement search
+    
 
 
 def main():

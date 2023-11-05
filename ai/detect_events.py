@@ -388,9 +388,9 @@ if __name__ == "__main__":
     post1 = search_event_from_video(item_search1)
     print(post1)
 
-    # item_search2 = "Count the ayes and no for each supervisor"
-    # post2 = qa_from_video(item_search2)
-    # print(post2)
+    item_search2 = "Count the ayes and no for each supervisor"
+    post2 = qa_from_video(item_search2)
+    print(post2)
 
     # has tag test
     # tags = gen_tags_from_video()
