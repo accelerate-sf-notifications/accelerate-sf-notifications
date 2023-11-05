@@ -195,7 +195,7 @@ def page_2():
 def page_3():
     # st.subheader("Watch the video recoding and ask your questions")
     st.subheader("Highlight")
-    st.video("data/1.mp4")
+    st.video("data/video1/gen_video_summary.mp4")
     ## TODO: chaonan99
     ## put a short video
     ## implement search

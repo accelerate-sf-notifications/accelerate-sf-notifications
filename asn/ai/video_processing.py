@@ -33,14 +33,19 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 
 import ffmpeg
+from asn.const import BASE_PATH, DATA_PATH
 
-file_path = "../chaonan99/data/response.json"
+
+file_path = DATA_PATH / 'video1/chapter.json'
+# file_path = DATA_PATH / 'video1/heighlight.json'
+# file_path = "/Users/ouyangzhihao/Desktop/sf_hackathon/accelerate-sf-notifications/data/video1/chapter.json"
 with open(file_path, 'r') as json_file:
     data = json.load(json_file)
 chapter_json = data
 
 
-working_dir = '../chaonan99/data/'
+working_dir = DATA_PATH / 'video1/short_videos'
+# working_dir = '/Users/ouyangzhihao/Desktop/sf_hackathon/accelerate-sf-notifications/data/video1/short_videos'
 
 
 # Your chapter JSON and working_dir would be defined here as before
