@@ -1,25 +1,37 @@
 import os
 import json
-from time import time
+import time
+from flask.templating import _default_template_ctx_processor
 
 import numpy as np
 import streamlit as st
-from asn.ai.twitter_generator import generate_twitter_post
-from asn.ai.detect_events import qa_from_video
-from asn.config import vars
+from mastodon import Mastodon, MastodonAPIError
 from twilio.rest import Client
-from mastodon import Mastodon
+
+from asn.ai.detect_events import qa_from_video
+from asn.ai.twitter_generator import generate_twitter_post
+from asn.config import vars
+from asn.const import BASE_PATH, DATA_PATH
 
 account_sid = vars["twilio"]["account_sid"]
 auth_token = vars["twilio"]["auth_token"]
 tw_client = Client(account_sid, auth_token)
 
-mas_client = Mastodon(access_token=vars["mastodon"]["access_token"], api_base_url="https://mastodon.social")
+mastodon = Mastodon(
+    client_id=vars["mastodon"]["client_id"],
+    client_secret=vars["mastodon"]["client_secret"],
+    access_token=vars["mastodon"]["access_token"],
+    api_base_url=vars["mastodon"]["api_base_url"]
+)
 
-info = json.load(open("asn/chaonan99/data/response.json"))
-# video_path = "sanfrancisco_bos_oct31_1.mp4"
-video_path = "asn/chaonan99/data/sanfrancisco_bos_oct31_1.mp4"
-video_path_template = "asn/chaonan99/data/chapter_{number}.mp4"
+
+info = json.load(open(BASE_PATH / "asn" / "chaonan99/data/response.json"))
+video_path = DATA_PATH / "demo_video_30min.mp4"
+assert video_path.exists()
+video_path = str(video_path)
+video_path_template = BASE_PATH / "asn" / "chaonan99/data/" / "chapter_{}.mp4"
+np.random.seed(42)
+
 
 # if st.checkbox('Show content'):
 #     st.markdown('<span style="color:red">This is some content.</span>', unsafe_allow_html=True)
@@ -34,12 +46,50 @@ video_path_template = "asn/chaonan99/data/chapter_{number}.mp4"
 
 def initialize():
     tags = info["hashtags"]
+    st.session_state['stage'] = 3
     st.session_state['concerned_tags'] = {t: False for t in tags}
     st.session_state['prev_time'] = -1
     st.session_state['current_section'] = 0
     st.session_state['messages'] = []
     st.session_state['video_path'] = ''
     st.session_state['phone_number'] = ''
+
+
+def post_on_mastodon(text, video_filename):
+    media = mastodon.media_post(
+        video_filename,
+        "video/mp4",
+    )
+
+    # Initialize variables for retry logic
+    max_retries = 10  # Maximum number of retries
+    retry_count = 0   # Current retry count
+    wait_time = 10    # Time to wait between retries in seconds
+    posted = False    # Flag to check if the post was successful
+
+    # Retry loop
+    while not posted and retry_count < max_retries:
+        try:
+            # Attempt to post the status
+            mastodon.status_post(
+                text, 
+                media_ids=[media['id']]
+            )
+            posted = True
+        except MastodonAPIError as e:
+            # Print out the contents of the error to understand its structure
+            print(e)
+            print(vars(e))
+
+            # Check if the error message contains 'processing'
+            if 'processing' in str(e):
+                # If media is still processing, wait and then try again
+                print(f"Media not processed yet, waiting {wait_time} seconds. Retry {retry_count + 1}/{max_retries}.")
+                time.sleep(wait_time)
+                retry_count += 1
+            else:
+                # If there is a different error, raise it
+                raise
 
 
 def page_1():
@@ -54,7 +104,7 @@ def page_1():
 
     if st.button("Subscribe"):
         st.session_state.stage = 2
-        st.session_state.page_2_start_time = time()
+        st.session_state.page_2_start_time = time.time()
         st.experimental_rerun()
 
 
@@ -65,9 +115,9 @@ def page_2():
     chapters = info["chapters"]
 
     # r1c1, r1c2 = st.columns(2)
-    st.header(f"Live: {info['title']}")
+    st.header(f"[Live] {info['title']}")
     col1, col2 = st.columns(2)
-    # current_time = int((time() - st.session_state.page_2_start_time) / 10)
+    # current_time = int((time.time() - st.session_state.page_2_start_time) / 10)
     # print(current_time)
     # current_time = video_comp()
     # current_time = r1c1.number_input("Mock livestreaming time", min_value=1, max_value=600)
@@ -88,9 +138,9 @@ def page_2():
     # Display video transcript in the left column
     # col1.header("Happening now")
     col1.subheader(c['chapter_title'])
-    curr_video_path = video_path_template.format(number=c['chapter_number'])
-    if not os.path.exists(curr_video_path):
-        os.symlink(video_path, curr_video_path)
+    # curr_video_path = video_path_template.format(number=c['chapter_number'])
+    # if not os.path.exists(curr_video_path):
+    #     os.symlink(video_path, curr_video_path)
         # col2.video(curr_video_path)
     col2.video(video_path, start_time=c["start"])
 
@@ -130,6 +180,9 @@ def page_2():
             st.subheader(f"Notification sent.")
             # st.subheader(message.sid)
             st.write(post)
+        # if "video_filename" in c:
+        #     vp = c["video_filename"]
+        #     post_on_mastodon(post, f"data/{vp}")
 
     # if st.button("Hearing finished"):
     #     st.session_state.stage = 3
@@ -140,7 +193,9 @@ def page_2():
 
 
 def page_3():
-    st.write("Show some summarization video")
+    # st.subheader("Watch the video recoding and ask your questions")
+    st.subheader("Highlight")
+    st.video("data/1.mp4")
     ## TODO: chaonan99
     ## put a short video
     ## implement search
@@ -148,7 +203,7 @@ def page_3():
         with st.chat_message(m['role']):
             st.markdown(m['content'])
 
-    msg = st.chat_input("")
+    msg = st.chat_input("Ask questions about the hearing")
     if msg:
         with st.chat_message('user'):
             st.markdown(msg)
@@ -164,7 +219,6 @@ def page_3():
 def main():
     if 'stage' not in st.session_state:
         initialize()
-        st.session_state.stage = 1
 
     if st.session_state.stage == 1:
         page_1()
