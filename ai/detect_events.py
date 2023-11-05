@@ -324,7 +324,7 @@ Please response in json format like:
 '''
     prompt = ChatPromptTemplate.from_template(prompt_str)
     # model = ChatOpenAI()
-    model = ChatOpenAI(model='gpt-4')
+    model = ChatOpenAI(model='gpt-4', temperature=0.1)
     chain = prompt | model
     res = chain.invoke({
         "background": transcript_text,
@@ -334,9 +334,60 @@ Please response in json format like:
     print("search_item:", search_item)
     return res.content
 
+
+def qa_from_video(search_item: str, transcript_text: str=video_transcript_text):
+    prompt_str = '''Please help me to answer the questions in [Question], you'll find the answer from [Background]
+
+[Question]:
+{search_item}
+[Background]: 
+{background}
+
+'''
+    prompt = ChatPromptTemplate.from_template(prompt_str)
+    model = ChatOpenAI(temperature=0.1)
+    # model = ChatOpenAI(model='gpt-4')
+    chain = prompt | model
+    res = chain.invoke({
+        "background": transcript_text,
+        "search_item": search_item
+    })
+    # print(res)
+    # import ipdb; ipdb.set_trace()
+    # print("search_item:", search_item)
+    return res.content
+    
+
+def gen_tags_from_video(transcript_text: str=video_transcript_text) -> str:
+    prompt_str = '''Please help me generate <=10 tags that is the highlight of the video which will be used to search content in the video?
+
+[Video transcript]: 
+{background}
+
+'''
+    prompt = ChatPromptTemplate.from_template(prompt_str)
+    # model = ChatOpenAI(temperature=0.1)
+    model = ChatOpenAI(model='gpt-4')
+    chain = prompt | model
+    res = chain.invoke({
+        "background": transcript_text,
+    })
+    return res.content
+
 if __name__ == "__main__":
     # Example usage
     # Generate a Twitter post with background information
-    item_seach = "MADAM Clerk"
-    post = search_event_from_video(item_seach)
-    print(post)
+    item_search1 = "Voter related to revolving funds"
+    # item_search1 = "Pledge of Allegiance"
+    post1 = search_event_from_video(item_search1)
+    print(post1)
+
+    # item_search2 = "Count the ayes and no for each supervisor"
+    # post2 = qa_from_video(item_search2)
+    # print(post2)
+
+    # has tag test
+    # tags = gen_tags_from_video()
+    # print(tags)
+
+    
