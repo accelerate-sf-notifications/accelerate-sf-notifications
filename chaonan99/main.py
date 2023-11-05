@@ -3,10 +3,12 @@ from time import time
 
 import numpy as np
 import streamlit as st
+from ai.twitter_generator import generate_twitter_post
+from ai.detect_events import qa_from_video
 
 
-info = json.load(open("data/response.json"))
-video_path = "data/sanfrancisco_bos_oct31_1.mp4"
+info = json.load(open("chaonan99/data/response.json"))
+video_path = "chaonan99/data/sanfrancisco_bos_oct31_1.mp4"
 
 # if st.checkbox('Show content'):
 #     st.markdown('<span style="color:red">This is some content.</span>', unsafe_allow_html=True)
@@ -24,6 +26,7 @@ def initialize():
     st.session_state['concerned_tags'] = {t: False for t in tags}
     st.session_state['prev_time'] = -1
     st.session_state['current_section'] = 0
+    st.session_state['messages'] = []
 
 
 def page_1():
@@ -94,6 +97,8 @@ def page_2():
     else:
         st.subheader("Have interested tags. Sending notification.")
         ## TODO: oyzh: actually send notification
+        background_info = "Monthly gathering for Peninsula for Everyone. Meet and organize with neighbors who are working to build a more inclusive and sustainable region."
+        post = generate_twitter_post(background_info)
 
     # if st.button("Hearing finished"):
     #     st.session_state.stage = 3
@@ -108,13 +113,27 @@ def page_3():
     ## TODO: chaonan99
     ## put a short video
     ## implement search
-    
+    for m in st.session_state.messages:
+        with st.chat_message(m['role']):
+            st.markdown(m['content'])
 
+    msg = st.chat_input("")
+    if msg:
+        with st.chat_message('user'):
+            st.markdown(msg)
+            st.session_state.messages.append({'role': 'user', 'content': msg})
+        with st.spinner(text='In progress...'):
+            res = qa_from_video(msg)
+        with st.chat_message('ai'):
+            print(res)
+            # from IPython import embed; embed(using=False); os._exit(0)
+            st.markdown(res)
+            st.session_state.messages.append({'role': 'ai', 'content': res})
 
 def main():
     if 'stage' not in st.session_state:
         initialize()
-        st.session_state.stage = 1
+        st.session_state.stage = 3
 
     if st.session_state.stage == 1:
         page_1()
