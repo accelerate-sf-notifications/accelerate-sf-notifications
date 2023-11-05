@@ -3,12 +3,20 @@ from time import time
 
 import numpy as np
 import streamlit as st
-from ai.twitter_generator import generate_twitter_post
-from ai.detect_events import qa_from_video
+from asn.ai.twitter_generator import generate_twitter_post
+from asn.ai.detect_events import qa_from_video
+from asn.config import vars
+from twilio.rest import Client
+from mastodon import Mastodon
 
+account_sid = vars["twilio"]["account_sid"]
+auth_token = vars["twilio"]["auth_token"]
+tw_client = Client(account_sid, auth_token)
 
-info = json.load(open("chaonan99/data/response.json"))
-video_path = "chaonan99/data/sanfrancisco_bos_oct31_1.mp4"
+mas_client = Mastodon(access_token=vars["mastodon"]["access_token"], api_base_url="https://mastodon.social")
+
+info = json.load(open("asn/chaonan99/data/response.json"))
+video_path = "asn/chaonan99/data/sanfrancisco_bos_oct31_1.mp4"
 
 # if st.checkbox('Show content'):
 #     st.markdown('<span style="color:red">This is some content.</span>', unsafe_allow_html=True)
@@ -95,10 +103,16 @@ def page_2():
     if len(set(tags_current_chapter) & set(interested_tags)) == 0:
         st.subheader("No interested topic.")
     else:
-        st.subheader("Have interested tags. Sending notification.")
         ## TODO: oyzh: actually send notification
         background_info = "Monthly gathering for Peninsula for Everyone. Meet and organize with neighbors who are working to build a more inclusive and sustainable region."
         post = generate_twitter_post(background_info)
+        message = tw_client.messages.create(
+            from_=vars["twilio"]["message_from"],
+            body=post,
+            to=vars["twilio"]["message_to"]
+        )
+        # mas_client
+        st.subheader(f"Notification sent. {message.sid}, {post}")
 
     # if st.button("Hearing finished"):
     #     st.session_state.stage = 3
@@ -133,7 +147,7 @@ def page_3():
 def main():
     if 'stage' not in st.session_state:
         initialize()
-        st.session_state.stage = 3
+        st.session_state.stage = 1
 
     if st.session_state.stage == 1:
         page_1()
