@@ -300,7 +300,7 @@ video_transcript_text = '''
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 
-
+# TODO make it easier to use
 def search_event_from_video(search_item: str, transcript_text: str=video_transcript_text):
     prompt_str = '''Please help me to find the [Search item] from the [Background], find <= 5 items.
 
@@ -359,15 +359,21 @@ def qa_from_video(search_item: str, transcript_text: str=video_transcript_text):
     
 
 def gen_tags_from_video(transcript_text: str=video_transcript_text) -> str:
-    prompt_str = '''Please help me generate <=10 tags that is the highlight of the video which will be used to search content in the video?
+    prompt_str = '''Please help me generate <=10 tags that is the highlight of the video which will be used to search content in the video. Respond in an array.
+Thhe tags are:
+- Meaningful
+- Easy to understand
+- 
 
 [Video transcript]: 
 {background}
 
+Response:
+[?, ?...]
 '''
     prompt = ChatPromptTemplate.from_template(prompt_str)
-    # model = ChatOpenAI(temperature=0.1)
-    model = ChatOpenAI(model='gpt-4')
+    model = ChatOpenAI(temperature=0.1)
+    # model = ChatOpenAI(model='gpt-4')
     chain = prompt | model
     res = chain.invoke({
         "background": transcript_text,
