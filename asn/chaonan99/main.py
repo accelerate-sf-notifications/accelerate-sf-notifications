@@ -136,7 +136,7 @@ def page_3():
 def main():
     if 'stage' not in st.session_state:
         initialize()
-        st.session_state.stage = 1
+        st.session_state.stage = 3
 
     if st.session_state.stage == 1:
         page_1()
