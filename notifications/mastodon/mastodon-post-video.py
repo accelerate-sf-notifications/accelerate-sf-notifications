@@ -10,7 +10,7 @@ mastodon = Mastodon(
 )
 
 # Upload the media
-media = mastodon.media_post('./twitter_demo.mp4', 'video/mp4')
+media = mastodon.media_post('./GoldenGa1939_512kb.mp4', 'video/mp4')
 
 # Initialize variables for retry logic
 max_retries = 10  # Maximum number of retries
@@ -22,7 +22,7 @@ posted = False    # Flag to check if the post was successful
 while not posted and retry_count < max_retries:
     try:
         # Attempt to post the status
-        mastodon.status_post('Your status message', media_ids=[media['id']])
+        mastodon.status_post('CHANGEME', media_ids=[media['id']])
         posted = True
     except MastodonAPIError as e:
         # Print out the contents of the error to understand its structure
