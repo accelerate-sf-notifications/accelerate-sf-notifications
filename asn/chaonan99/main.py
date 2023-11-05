@@ -3,12 +3,15 @@ from time import time
 
 import numpy as np
 import streamlit as st
-from ai.twitter_generator import generate_twitter_post
-from ai.detect_events import qa_from_video
 
+from asn.ai.detect_events import qa_from_video
+from asn.ai.twitter_generator import generate_twitter_post
+from asn.const import BASE_PATH, DATA_PATH
 
-info = json.load(open("chaonan99/data/response.json"))
-video_path = "chaonan99/data/sanfrancisco_bos_oct31_1.mp4"
+info = json.load(open(BASE_PATH / "asn" / "chaonan99/data/response.json"))
+video_path = DATA_PATH / "demo_video_30min.mp4"
+assert video_path.exists()
+video_path = str(video_path)
 
 # if st.checkbox('Show content'):
 #     st.markdown('<span style="color:red">This is some content.</span>', unsafe_allow_html=True)
@@ -133,7 +136,7 @@ def page_3():
 def main():
     if 'stage' not in st.session_state:
         initialize()
-        st.session_state.stage = 3
+        st.session_state.stage = 1
 
     if st.session_state.stage == 1:
         page_1()
