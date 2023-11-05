@@ -1,0 +1,23 @@
+{
+  "id": "c62ba6fb-50d3-4501-8322-5e6d95f8a047",
+  "highlights": [
+    {
+      "start": 30,
+      "end": 45,
+      "highlight": "CCTV footage of a meeting in San Francisco City Hall",
+      "highlight_summary": "A CCTV footage from a meeting in San Francisco City Hall, where city supervisors are gathered."
+    },
+    {
+      "start": 780,
+      "end": 795,
+      "highlight": "Proposal to address the crisis of police understaffing",
+      "highlight_summary": "A proposal to address the crisis of police understaffing in San Francisco through a charter reform drafting request."
+    },
+    {
+      "start": 1290,
+      "end": 1305,
+      "highlight": "Honoring the memory of Jose Orlando Salazar",
+      "highlight_summary": "An in memoriam to honor the life of Jose Orlando Salazar, who passed away."
+    }
+  ]
+}

@@ -80,7 +80,8 @@ def gen_video_segments(input_video_path: str) -> list:
     return segment_paths
 
 # Example usage
-input_video = '/Users/ouyangzhihao/Desktop/Screen Recording 2023-02-28 at 11.00.34.mov'
+# input_video = '/Users/ouyangzhihao/Desktop/Screen Recording 2023-02-28 at 11.00.34.mov'
+input_video = '/Users/ouyangzhihao/Downloads/San Francisco Board Meeting.mp4'
 generated_segments = gen_video_segments(input_video)
 
 # Optionally print the paths of the generated segments
