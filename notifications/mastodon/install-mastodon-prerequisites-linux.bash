@@ -2,4 +2,4 @@
 
 cd $(dirname $0)
 
-source ./install-mastodon-prerequisites-python.sh
+source ./install-mastodon-prerequisites-python.bash
