@@ -93,7 +93,7 @@ def page_2():
         st.subheader("No interested topic.")
     else:
         st.subheader("Have interested tags. Sending notification.")
-        ## TODO: actually send notification
+        ## TODO: oyzh: actually send notification
 
     # if st.button("Hearing finished"):
     #     st.session_state.stage = 3
@@ -105,7 +105,7 @@ def page_2():
 
 def page_3():
     st.write("Show some summarization video")
-    ## TODO: oyzh
+    ## TODO: chaonan99
     ## put a short video
     ## implement search
     
