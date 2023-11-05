@@ -46,7 +46,7 @@ np.random.seed(42)
 
 def initialize():
     tags = info["hashtags"]
-    st.session_state['stage'] = 3
+    st.session_state['stage'] = 1
     st.session_state['concerned_tags'] = {t: False for t in tags}
     st.session_state['prev_time'] = -1
     st.session_state['current_section'] = 0
