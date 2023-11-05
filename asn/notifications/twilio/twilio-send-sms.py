@@ -1,17 +1,13 @@
-import sys
-sys.path.append('../../')
-import config
-
 from twilio.rest import Client
 
-account_sid = config.vars["twilio"]["account_sid"]
-auth_token = config.vars["twilio"]["auth_token"]
+account_sid = 'CHANGEME'
+auth_token = 'CHANGEME'
 client = Client(account_sid, auth_token)
 
 message = client.messages.create(
-  from_=config.vars["twilio"]["message_from"],
-  body=config.vars["twilio"]["message_body"],
-  to=config.vars["twilio"]["message_to"]
+  from_='CHANGEME',
+  body='CHANGEME',
+  to='CHANGEME'
 )
 
 print(message.sid)

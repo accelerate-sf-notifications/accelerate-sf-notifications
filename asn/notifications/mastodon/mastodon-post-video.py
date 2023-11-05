@@ -1,20 +1,16 @@
-import sys
-sys.path.append('../../')
-import config
-
 from mastodon import Mastodon, MastodonAPIError
 import time
 
 # Initialize the API with your access token, client_id, and client_secret
 mastodon = Mastodon(
-    client_id=config.vars["mastodon"]["client_id"],
-    client_secret=config.vars["mastodon"]["client_secret"],
-    access_token=config.vars["mastodon"]["access_token"],
-    api_base_url=config.vars["mastodon"]["api_base_url"]
+    client_id='CHANGEME',
+    client_secret='CHANGEME',  # You need to include the client_secret here
+    access_token='CHANGEME',
+    api_base_url='https://mastodon.social'
 )
 
 # Upload the media
-media = mastodon.media_post(config.vars["mastodon"]["video_filename"], config.vars["mastodon"]["video_filetype"])
+media = mastodon.media_post('./GoldenGa1939_512kb.mp4', 'video/mp4')
 
 # Initialize variables for retry logic
 max_retries = 10  # Maximum number of retries
@@ -26,7 +22,7 @@ posted = False    # Flag to check if the post was successful
 while not posted and retry_count < max_retries:
     try:
         # Attempt to post the status
-        mastodon.status_post(config.vars["mastodon"]["video_status"], media_ids=[media['id']])
+        mastodon.status_post('CHANGEME', media_ids=[media['id']])
         posted = True
     except MastodonAPIError as e:
         # Print out the contents of the error to understand its structure
