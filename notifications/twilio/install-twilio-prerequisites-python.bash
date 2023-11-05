@@ -1,3 +1,3 @@
 #!/bin/sh -x
 
-pip3 install twilio
+pip3 install -r requirements.txt
