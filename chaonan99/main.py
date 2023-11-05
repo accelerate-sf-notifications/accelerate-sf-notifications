@@ -3,8 +3,7 @@ from time import time
 
 import numpy as np
 import streamlit as st
-import streamlit.components.v1 as components
-from streamlit_player import st_player
+from my_component import my_component
 
 
 info = json.load(open("data/response.json"))
@@ -17,8 +16,8 @@ video_path = "data/sanfrancisco_bos_oct31_1.mp4"
 # from IPython import embed; embed(using=False); os._exit(0)
 
 
-def video_comp():
-    return components.html(open("video_comp/index.html").read(), width=320, height=240,)
+# def video_comp():
+#     return components.html(open("video_comp/index.html").read(), width=320, height=240,)
 
 
 def initialize():
@@ -48,50 +47,53 @@ def page_2():
     # r1c1, r1c2 = st.columns(2)
     st.header(f"Live: {info['title']}")
     col1, col2 = st.columns(2)
-    current_time = video_comp()
+    # current_time = video_comp()
+    current_time = 300
     # current_time = r1c1.number_input("Mock livestreaming time", min_value=1, max_value=600)
     print(current_time)
     # from IPython import embed; embed(using=False); os._exit(0)
-    # for c in chapters:
-    #     if c["start"] <= current_time and c["end"] > current_time:
-    #         break
+    for c in chapters:
+        if c["start"] <= current_time and c["end"] > current_time:
+            break
 
-    # ## All tags
-    # tags = info["hashtags"]
-    # interested_tags = {k for k, v in st.session_state.concerned_tags.items() if v}
+    ## All tags
+    tags = info["hashtags"]
+    interested_tags = {k for k, v in st.session_state.concerned_tags.items() if v}
 
-    # # Display video transcript in the left column
-    # # col1.header("Happening now")
-    # col1.subheader(c['chapter_title'])
+    # Display video transcript in the left column
+    # col1.header("Happening now")
+    col1.subheader(c['chapter_title'])
 
-    # # col1.header("Summary")
-    # col1.caption(c["chapter_summary"])
-    # tags_current_chapter = np.random.choice(tags, 3, replace=False)
-    # # Display video in the right column
-    # # col2.header("Video")
-    # # if st.session_state.prev_time != current_time:
-    # #     st.session_state.prev_time = current_time
-    # #     st.experimental_rerun()
-    # # else:
-    # # if r1c2.button("Set livestreming time"):
-    # #     col2.video(video_path, start_time=current_time)
+    # col1.header("Summary")
+    col1.caption(c["chapter_summary"])
+    tags_current_chapter = np.random.choice(tags, 3, replace=False)
+    # Display video in the right column
+    # col2.header("Video")
+    # if st.session_state.prev_time != current_time:
+    #     st.session_state.prev_time = current_time
+    #     st.experimental_rerun()
+    # else:
+    # if r1c2.button("Set livestreming time"):
+    #     col2.video(video_path, start_time=current_time)
+    with col2:
+        current_time = my_component(h=300)
     # col2.video(video_path, start_time=300)
 
-    # st.subheader("Hashtags")
-    # for tag in tags_current_chapter:
-    #     if tag in interested_tags:
-    #         st.markdown(f'<div style="color: red; font-size: 15px; border: 1px solid red; display: inline-block; padding: 5px; margin: 2px;">{tag}</div>', unsafe_allow_html=True)
-    #     else:
-    #         st.markdown(f'<div style="font-size: 15px; border: 1px solid black; display: inline-block; padding: 5px; margin: 2px;">{tag}</div>', unsafe_allow_html=True)
+    st.subheader("Hashtags")
+    for tag in tags_current_chapter:
+        if tag in interested_tags:
+            st.markdown(f'<div style="color: red; font-size: 15px; border: 1px solid red; display: inline-block; padding: 5px; margin: 2px;">{tag}</div>', unsafe_allow_html=True)
+        else:
+            st.markdown(f'<div style="font-size: 15px; border: 1px solid black; display: inline-block; padding: 5px; margin: 2px;">{tag}</div>', unsafe_allow_html=True)
         
-    # if len(set(tags_current_chapter) & set(interested_tags)) == 0:
-    #     st.subheader("No interested topic.")
-    # else:
-    #     st.subheader("Have interested tags. Sending notification.")
+    if len(set(tags_current_chapter) & set(interested_tags)) == 0:
+        st.subheader("No interested topic.")
+    else:
+        st.subheader("Have interested tags. Sending notification.")
 
-    # if st.button("Hearing finished"):
-    #     st.session_state.stage = 3
-    #     st.experimental_rerun()
+    if st.button("Hearing finished"):
+        st.session_state.stage = 3
+        st.experimental_rerun()
 
 
 def page_3():
